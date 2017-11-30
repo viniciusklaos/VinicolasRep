@@ -19,9 +19,8 @@ verificadominio () {
 		echo -e "${AMARELO}Domínio principal:${VERDE} $dominioprincipal"
 	else
 		echo $dominio > /home/vtinstall/vartemp/dominiobase
+	fi
 }
-
-
 verificalogin () {
 	cd /home/vtinstall/vartemp
 	tr -dc ‘a-z’ < domaintemp > lgtmp
@@ -50,7 +49,6 @@ verificalogin () {
 	fi
 	iemlogin=`echo $dominio | cut -d. -f1`
 }
-
 instala_vt_libs () {
 	cd /usr/local/bin
 	> ips
@@ -79,7 +77,6 @@ gera_spf () {
 	sed -i ':a;$!N;s/\n//;ta;' /home/vtinstall/vartemp/spf.info
 	SPF=`cat /home/vtinstall/vartemp/spf.info`
 }
-
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
 verificaip;
@@ -98,4 +95,4 @@ gera_spf;
 # dns_signo
 # configura_mysql
 # gera_cron
-#conde
+# wesley
