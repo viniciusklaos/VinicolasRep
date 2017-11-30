@@ -98,3 +98,4 @@ gera_spf;
 # dns_signo
 # configura_mysql
 # gera_cron
+#conde
