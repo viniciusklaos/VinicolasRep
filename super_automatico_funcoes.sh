@@ -1,16 +1,16 @@
 verificaip () {
-	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
-	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
-	diff ipdedicado.info ips.info | grep ^\> > livres.info && sed -i 's/> /Disponível: /g' livres.info
-	IPSLIVRE=`cat livres.info`
-	if [ -z "$IPSLIVRE" ] then
-		echo -e "${VERMELHO} Sem IPS livres para dedicar na maquina${RESET}"
-		sleep 3
-		exit
-	else
-		echo -e "${RESET}"
-	fi
-	rm -Rf ips.info ipdedicado.info
+ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
+cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
+IPSLIVRE=`diff ipdedicado.info ips.info | grep ^\> | sed 's/> /Disponível: /g'`
+if [ -z "$IPSLIVRE" ]
+then
+	clear
+	echo -e "${VERMELHO} Sem IPS livres para dedicar na maquina${RESET}"
+	exit
+else
+	clear
+fi
+rm -Rf ips.info ipdedicado.info
 }
 verificadominio () {
 	BASE=/home/vtinstall/vartemp/dominiobase
