@@ -19,6 +19,9 @@ verificadominio () {
 		echo -e "${AMARELO}Domínio principal:${VERDE} $dominioprincipal"
 	else
 		echo $dominio > /home/vtinstall/vartemp/dominiobase
+		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
+		echo "Configurando novo VPS de dominio: $dominio"
+		sleep 3
 	fi
 }
 verificalogin () {
@@ -57,12 +60,12 @@ instala_vt_libs () {
 	echo "cat /etc/trueuserdomains | cut -d: -f1" > dominios
 	chmod a+x ips
 	chmod a+x dominios
-	rm -rf dedicar; wget http://rep.vitalhost.com.br/v4/semcpanel/dedicar; chmod a+x dedicar;
-	rm -rf remover; wget http://rep.vitalhost.com.br/v4/semcpanel/remover; chmod a+x remover;
-	rm -rf contar; wget http://rep.vitalhost.com.br/v4/semcpanel/contar; chmod a+x contar;
-	rm -rf suspender; wget http://rep.vitalhost.com.br/v4/semcpanel/suspender; chmod a+x suspender;
-	rm -rf unsuspender; wget http://rep.vitalhost.com.br/v4/semcpanel/unsuspender; chmod a+x unsuspender;
-	rm -rf ipuso; wget http://rep.vitalhost.com.br/v4/semcpanel/ipuso; chmod a+x ipuso;
+	rm -rf dedicar; curl -O http://rep.vitalhost.com.br/v4/semcpanel/dedicar; chmod a+x dedicar;
+	rm -rf remover; curl -O http://rep.vitalhost.com.br/v4/semcpanel/remover; chmod a+x remover;
+	rm -rf contar; curl -O http://rep.vitalhost.com.br/v4/semcpanel/contar; chmod a+x contar;
+	rm -rf suspender; curl -O http://rep.vitalhost.com.br/v4/semcpanel/suspender; chmod a+x suspender;
+	rm -rf unsuspender; curl -O http://rep.vitalhost.com.br/v4/semcpanel/unsuspender; chmod a+x unsuspender;
+	rm -rf ipuso; curl -O http://rep.vitalhost.com.br/v4/semcpanel/ipuso; chmod a+x ipuso;
 	## -- Instalando vtbackup
 	cd /home; rm -rf instalarbackup.sh; wget rep.vitalhost.com.br/v4/backup/instalarbackup.sh && sh instalarbackup.sh; rm -rf instalarbackup.sh
 }
@@ -82,17 +85,39 @@ read dominio
 verificaip;
 verificadominio;
 echo $dominio > /home/vtinstall/vartemp/domaintemp
-verificalogin;
-# whm_config
-# tweak_settings
-# configura_exim
-# configura_php
-insala_vt_libs;
-# motd
-# pagina_suspensao
-gera_spf;
-# dns_vps
-# dns_signo
-# configura_mysql
-# gera_cron
-# wesley
+if [ $dominioprincipal == $dominio ]; then
+	insala_vt_libs;
+	# whm_config
+	# tweak_settings
+	# configura_exim
+	# configura_php
+	# motd
+	# pagina_suspensao
+	# configura_mysql
+	verificalogin;
+	gera_spf;
+	# cria_conta
+	# dns_vps
+	# public_e_banco
+	# gera_cron
+	echo -e "DNS:"
+	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
+	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
+	echo -e ""
+	echo -e "Reversos:"
+	echo -e "${AMARELO}$ipprincipal > server.$dominio"
+	echo -e "${AMARELO}$ipsecundario > smtp.$dominio ${RESET}"
+else
+	verificalogin;
+	gera_spf;
+	# cria_conta
+	# dns_signo
+	# public_e_banco
+	# gera_cron
+	echo -e "DNS:"
+	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
+	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
+	echo -e ""
+	echo -e "Reverso:"
+	echo -e "${AMARELO}$ipdd > smtp.$dominio${RESET}"
+fi
