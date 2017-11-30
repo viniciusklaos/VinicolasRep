@@ -1,16 +1,17 @@
 verificaip () {
-ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
-cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
-IPSLIVRE=`diff ipdedicado.info ips.info | grep ^\> | sed 's/> /Disponível: /g'`
-if [ -z "$IPSLIVRE" ]
-then
-	clear
-	echo -e "${VERMELHO} Sem IPS livres para dedicar na maquina${RESET}"
-	exit
-else
-	clear
-fi
-rm -Rf ips.info ipdedicado.info
+	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
+	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
+	IPSLIVRE=`diff ipdedicado.info ips.info | grep ^\> | sed 's/> /Disponível: /g'`
+	if [ -z "$IPSLIVRE" ]
+	then
+		clear
+		echo -e "${VERMELHO} Sem IPS livres para dedicar na maquina${RESET}"
+		sleep 3
+		exit
+	else
+		clear
+	fi
+	rm -Rf ips.info ipdedicado.info
 }
 verificadominio () {
 	BASE=/home/vtinstall/vartemp/dominiobase
@@ -80,6 +81,18 @@ gera_spf () {
 	sed -i ':a;$!N;s/\n//;ta;' /home/vtinstall/vartemp/spf.info
 	SPF=`cat /home/vtinstall/vartemp/spf.info`
 }
+whm_config () {}
+tweak_settings () {}
+configura_exim () {}
+configura_php () {}
+motd () {}
+pagina_suspensao () {}
+configura_mysql () {}
+cria_conta () {}
+dns_vps () {}
+dns_signo () {}
+public_e_banco () {}
+gera_cron () {}
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
 verificaip;
@@ -87,19 +100,19 @@ verificadominio;
 echo $dominio > /home/vtinstall/vartemp/domaintemp
 if [ $dominioprincipal == $dominio ]; then
 	insala_vt_libs;
-	# whm_config
-	# tweak_settings
-	# configura_exim
-	# configura_php
-	# motd
-	# pagina_suspensao
-	# configura_mysql
+	whm_config;
+	tweak_settings;
+	configura_exim;
+	configura_php;
+	motd;
+	pagina_suspensao;
+	configura_mysql;
 	verificalogin;
 	gera_spf;
-	# cria_conta
-	# dns_vps
-	# public_e_banco
-	# gera_cron
+	cria_conta;
+	dns_vps;
+	public_e_banco;
+	gera_cron;
 	echo -e "DNS:"
 	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
 	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
@@ -110,10 +123,10 @@ if [ $dominioprincipal == $dominio ]; then
 else
 	verificalogin;
 	gera_spf;
-	# cria_conta
-	# dns_signo
-	# public_e_banco
-	# gera_cron
+	cria_conta;
+	dns_signo;
+	public_e_banco;
+	gera_cron;
 	echo -e "DNS:"
 	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
 	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
