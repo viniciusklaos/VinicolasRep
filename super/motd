@@ -1,0 +1,11 @@
+# - MOTD
+echo "" > /etc/motd
+echo "Server: server.$dominioprincipal"
+echo "Esse servidor contém:" >> /etc/motd
+echo "" >> /etc/motd
+echo "ipuso - dedicar - remover - contar" >> /etc/motd
+echo "ips - dominios - suspender - unsuspender" >> /etc/motd
+echo "" >> /etc/motd
+echo "Bem vindo" >> /etc/motd
+echo "Vital Host 2017 - SmartCpanel" >> /etc/motd
+echo "" >> /etc/motd
