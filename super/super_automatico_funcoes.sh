@@ -1,3 +1,12 @@
+cores_gnu () {
+	VERMELHO="\033[01;31;40m"
+	VERDE="\033[01;32;40m"
+	AMARELO="\033[01;33;40m"
+	AZUL="\033[01;34;40m"
+	ROSA="\033[01;35;40m"
+	CIANO="\033[01;36;40m"
+	RESET="\033[00;37;40m"
+}
 verificaip () {
 	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
 	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
@@ -93,6 +102,7 @@ dns_vps () {}
 dns_signo () {}
 public_e_banco () {}
 gera_cron () {}
+cores_gnu;
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
 verificaip;
