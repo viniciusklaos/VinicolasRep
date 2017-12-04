@@ -7,6 +7,20 @@ cores_gnu () {
 	CIANO="\033[01;36;40m"
 	RESET="\033[00;37;40m"
 }
+instala_caminhos () {
+	echo "/home/vtinstall
+	/home/vtinstall/vartemp
+	/home/vtinstall/menu
+	/home/vtinstall/menusistema
+	/home/vtinstall/scripts
+	/home/vtinstall/spamtraps
+	/home/vtinstall/update
+	/home/vtinstall/vtbackups" > /home/caminhos.temp
+	for CAMINHO in `cat caminhos.temp`; do
+		[ -d $CAMINHO ] || mkdir $CAMINHO; cd $CAMINHO;
+	done
+	rm -Rf /home/caminhos.temp
+}
 verificaip () {
 	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
 	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
@@ -470,6 +484,7 @@ gera_cron () {
 cores_gnu;
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
+instala_caminhos;
 verificaip;
 verificadominio;
 echo $dominio > /home/vtinstall/vartemp/domaintemp
@@ -479,7 +494,7 @@ if [ $dominioprincipal == $dominio ]; then
 	tweak_settings;
 	configura_exim;
 	configura_php;
-	motd;
+	motd;ç
 	pagina_suspensao;
 	verificalogin;
 	gera_spf;
