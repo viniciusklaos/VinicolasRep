@@ -32,7 +32,7 @@ verificadominio () {
 	else
 		echo $dominio > /home/vtinstall/vartemp/dominiobase
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
-		clar
+		clear
 		echo "Configurando novo VPS de dominio: $dominio"
 		sleep 3
 	fi
