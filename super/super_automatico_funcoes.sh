@@ -26,10 +26,13 @@ verificadominio () {
 	BASE=/home/vtinstall/vartemp/dominiobase
 	if [ -z "$BASE" ]; then
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
+		clear
 		echo -e "${AMARELO}Domínio principal:${VERDE} $dominioprincipal"
+		sleep 3
 	else
 		echo $dominio > /home/vtinstall/vartemp/dominiobase
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
+		clar
 		echo "Configurando novo VPS de dominio: $dominio"
 		sleep 3
 	fi
@@ -335,6 +338,10 @@ pagina_suspensao () {
 	chattr +i /var/cpanel/webtemplates/root/english/suspended.tmpl
 }
 cria_conta () {
+	cd /home/vtinstall/vartemp/
+	curl -O http://rep.vitalhost.com.br/v4/semcpanel/vitchun.info
+	senhavital=`cat /home/vtinstall/vartemp/vitchun.info`
+	rm -rf /home/vtinstall/vartemp/vitchun.info
 	chattr -i /etc/mailips
 	cat /etc/mailips > /etc/mailips.vt.temp
 	sort /etc/mailips.vt.temp > /etc/mailips.vt
@@ -359,9 +366,11 @@ public_e_banco () {
 	taxahora=`cat /tmp/horatemp`
 	taxames=`cat /tmp/mestemp`
 	admin=`cat /tmp/admin`
+	PowerMTA=`cat /tmp/envio`
 
 	mysql -e "create database ${logindaconta}_banco;"
 	mysql -Be "grant all privileges on ${logindaconta}_banco.* to '${logindaconta}_dbuser'@'localhost' identified by \"phCA24bgK\";"
+
 	if [ "$admin" == '0' ] && [ "$PowerMTA" == '0' ] ; then # Não é administrador e envia com EXIM:
 	  cd /home/$logindaconta/public_html
 	  wget http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz
