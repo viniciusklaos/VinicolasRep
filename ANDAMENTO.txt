@@ -1,0 +1,17 @@
+cores_gnu = OK
+verificaip = OK
+verificadominio = OK
+verificalogin = CONDE
+instala_vt_libs = OK
+gera_spf = OK
+whm_config = OK
+tweak_settings = NULL
+configura_exim = WESLEY
+configura_php = OK
+motd = NULL
+pagina_suspensao = OK
+cria_conta = NULL
+dns_vps = NULL
+dns_signo = NULL
+public_e_banco = NULL
+gera_cron = OK
