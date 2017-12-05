@@ -484,12 +484,12 @@ gera_cron () {
 cores_gnu;
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
-instala_caminhos;
 verificaip;
 verificadominio;
 echo $dominio > /home/vtinstall/vartemp/domaintemp
 if [ $dominioprincipal == $dominio ]; then
-	insala_vt_libs;
+	instala_vt_libs;
+	instala_caminhos;
 	whm_config;
 	tweak_settings;
 	configura_exim;
