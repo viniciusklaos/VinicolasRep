@@ -7,20 +7,6 @@ cores_gnu () {
 	CIANO="\033[01;36;40m"
 	RESET="\033[00;37;40m"
 }
-instala_caminhos () {
-	echo "/home/vtinstall
-	/home/vtinstall/vartemp
-	/home/vtinstall/menu
-	/home/vtinstall/menusistema
-	/home/vtinstall/scripts
-	/home/vtinstall/spamtraps
-	/home/vtinstall/update
-	/home/vtinstall/vtbackups" > /home/caminhos.temp
-	for CAMINHO in `cat caminhos.temp`; do
-		[ -d $CAMINHO ] || mkdir $CAMINHO; cd $CAMINHO;
-	done
-	rm -Rf /home/caminhos.temp
-}
 verificaip () {
 	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
 	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
@@ -53,28 +39,31 @@ verificadominio () {
 }
 verificalogin () {
 	cd /home/vtinstall/vartemp
-	tr -dc ‘a-z’ < domaintemp > lgtmp
+	tr -dc "a-z" < /home/vtinstall/vartemp/domaintemp > /home/vtinstall/vartemp/lgtmp
 	logindaconta=`cat /home/vtinstall/vartemp/lgtmp | cut -c 1-8`
 	## -- Verificando se já existe uma conta com este nome:
-	CONTA=/home/$logindaconta
-	if [ -z "$CONTA" ]; then
+	if [ -d /home/$logindaconta ]; then
 		echo $logindaconta > /home/vtinstall/vartemp/loginconflito
 		loginconflito=`cat /home/vtinstall/vartemp/loginconflito`
 		logincerto=`echo $loginconflito | cut -c 1-7`
-		echo $logincerto > /home/vtinstall/vartemp/loginconflito
-		sed -i 's/$/2/' /home/vtinstall/vartemp/loginconflito
+		numerologin=`echo $loginconflito | cut -c 8`
+		if [[ $numerologin = [[:digit:]] ]]; then
+			echo "${logincerto}$((${numerologin}+1))" > /home/vtinstall/vartemp/loginconflito
+	else 
+			echo "${logincerto}1" > /home/vtinstall/vartemp/loginconflito
+		fi
 		logindaconta=`cat /home/vtinstall/vartemp/loginconflito`
-		rm -rf /home/vtinstall/vartemp/loginconflito
+		#rm -rf /home/vtinstall/vartemp/loginconflito
 		clear
 		echo ""
 		echo -e "${AMARELO}Este login da conta já existe, e o mesmo foi alterado para:${VERDE} $logindaconta ${RESET}"
 		sleep 3
-	else
-		clear
-		echo ""
-		echo -e "${VERDE}Login da conta OK"
-		sleep 1
-		clear
+		else
+			#clear
+			echo ""
+			echo -e "${VERDE}Login da conta OK"
+			sleep 1
+			#clear
 	fi
 	iemlogin=`echo $dominio | cut -d. -f1`
 }
@@ -254,15 +243,36 @@ configura_exim () {
 	perl -p -i -e 's/smtp_accept_max = 100/smtp_accept_max = 5000/g' /etc/exim.conf
 }
 configura_php () {
-	PHP56="/opt/cpanel/ea-php56/root/etc/php.ini"
-	sed -i '/max_execution_time =/d' $PHP56
-	sed -i '/max_input_time =/d' $PHP56
-	sed -i '/upload_max_filesize =/d' $PHP56
-	sed -i '/memory_limit =/d' $PHP56
-	echo "max_execution_time = 300" >> $PHP56
-	echo "max_input_time = 300" >> $PHP56
-	echo "upload_max_filesize = 8M" >> $PHP56
-	echo "memory_limit = 1024M" >> $PHP56
+	# - Configurando o PHP 5.5
+	perl -p -i -e 's/max_execution_time = 30/max_execution_time = 300/g' /opt/cpanel/ea-php55/root/etc/php.d/local.ini
+	perl -p -i -e 's/max_input_time = 60/max_input_time = 300/g' /opt/cpanel/ea-php55/root/etc/php.d/local.ini
+	perl -p -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 8M/g' /opt/cpanel/ea-php55/root/etc/php.d/local.ini
+	perl -p -i -e 's/vmemory_limit = 64M/memory_limit = 1024M/g' /opt/cpanel/ea-php55/root/etc/php.d/local.ini
+	#
+	perl -p -i -e 's/max_execution_time = 30/max_execution_time = 300/g' /opt/cpanel/ea-php55/root/etc/php.ini
+	perl -p -i -e 's/max_input_time = 60/max_input_time = 300/g' /opt/cpanel/ea-php55/root/etc/php.ini
+	perl -p -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 8M/g' /opt/cpanel/ea-php55/root/etc/php.ini
+	perl -p -i -e 's/vmemory_limit = 64M/memory_limit = 1024M/g' /opt/cpanel/ea-php55/root/etc/php.ini
+	# - Configurando o PHP 5.6
+	perl -p -i -e 's/max_execution_time = 30/max_execution_time = 300/g' /opt/cpanel/ea-php56/root/etc/php.d/local.ini
+	perl -p -i -e 's/max_input_time = 60/max_input_time = 300/g' /opt/cpanel/ea-php56/root/etc/php.d/local.ini
+	perl -p -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 8M/g' /opt/cpanel/ea-php56/root/etc/php.d/local.ini
+	perl -p -i -e 's/vmemory_limit = 64M/memory_limit = 1024M/g' /opt/cpanel/ea-php56/root/etc/php.d/local.ini
+	#
+	perl -p -i -e 's/max_execution_time = 30/max_execution_time = 300/g' /opt/cpanel/ea-php56/root/etc/php.ini
+	perl -p -i -e 's/max_input_time = 60/max_input_time = 300/g' /opt/cpanel/ea-php56/root/etc/php.ini
+	perl -p -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 8M/g' /opt/cpanel/ea-php56/root/etc/php.ini
+	perl -p -i -e 's/vmemory_limit = 64M/memory_limit = 1024M/g' /opt/cpanel/ea-php56/root/etc/php.ini
+	# - Configurando o PHP 7.0
+	perl -p -i -e 's/max_execution_time = 30/max_execution_time = 300/g' /opt/cpanel/ea-php70/root/etc/php.d/local.ini
+	perl -p -i -e 's/max_input_time = 60/max_input_time = 300/g' /opt/cpanel/ea-php70/root/etc/php.d/local.ini
+	perl -p -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 8M/g' /opt/cpanel/ea-php70/root/etc/php.d/local.ini
+	perl -p -i -e 's/vmemory_limit = 64M/memory_limit = 1024M/g' /opt/cpanel/ea-php70/root/etc/php.d/local.ini
+	#
+	perl -p -i -e 's/max_execution_time = 30/max_execution_time = 300/g' /opt/cpanel/ea-php70/root/etc/php.ini
+	perl -p -i -e 's/max_input_time = 60/max_input_time = 300/g' /opt/cpanel/ea-php70/root/etc/php.ini
+	perl -p -i -e 's/upload_max_filesize = 2M/upload_max_filesize = 8M/g' /opt/cpanel/ea-php70/root/etc/php.ini
+	perl -p -i -e 's/vmemory_limit = 64M/memory_limit = 1024M/g' /opt/cpanel/ea-php70/root/etc/php.ini
 }
 motd () {
 	# - MOTD
@@ -494,7 +504,7 @@ if [ $dominioprincipal == $dominio ]; then
 	tweak_settings;
 	configura_exim;
 	configura_php;
-	motd;ç
+	motd;
 	pagina_suspensao;
 	verificalogin;
 	gera_spf;
