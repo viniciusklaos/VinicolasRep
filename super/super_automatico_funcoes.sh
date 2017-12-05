@@ -10,7 +10,7 @@ cores_gnu () {
 verificaip () {
 	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
 	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
-	IPSLIVRE=`diff ipdedicado.info ips.info | grep ^\> | sed 's/> /Disponível: /g'`
+	IPSLIVRE=`diff ipdedicado.info ips.info | grep ^\> | sed 's/> //g'`
 	if [ -z "$IPSLIVRE" ]
 	then
 		clear
@@ -18,9 +18,57 @@ verificaip () {
 		sleep 3
 		exit
 	else
-		clear
+		echo -e "${AMARELO}Qual IP deseja dedicar para o domínio:${VERDE} $dominio ?"
+		echo ""
+		echo -e "${VERDE}IPS Disponiveis:"
+		echo $IPSLIVRE | sed 's/ /\n/g'
+		echo -e "${RESET}"
+		instalar_ip;
 	fi
 	rm -Rf ips.info ipdedicado.info
+}
+instalar_ip () {
+	read ipdd
+	if grep -w -q $ipdd ips.info; then
+		if grep -q -w $ipdd /etc/mailips; then
+			clear
+			echo "IP já utilizado por outro cliente, por favor escolha outro"
+			sleep 1
+			echo -e "${VERDE}."
+			sleep 1
+			echo -e "${AMARELO}."
+			sleep 1
+			echo -e "${VERMELHO}."
+			sleep 1
+			clear
+			verificaip;
+		fi
+	else
+			clear
+	    echo -e "${VERMELHO}IP não disponível neste servidor."
+			sleep 1
+			echo -e "${VERDE}."
+			sleep 1
+			echo -e "${AMARELO}."
+			sleep 1
+			echo -e "${VERMELHO}."
+			sleep 1
+			clear
+			verificaip;
+	fi
+}
+instala_caminhos () {
+	echo "/home/vtinstall
+	/home/vtinstall/vartemp
+	/home/vtinstall/menu
+	/home/vtinstall/menusistema
+	/home/vtinstall/scripts
+	/home/vtinstall/spamtraps
+	/home/vtinstall/update
+	/home/vtinstall/vtbackups" > /home/caminhos.temp
+	for CAMINHO in `cat caminhos.temp`; do
+		[ -d $CAMINHO ] || mkdir $CAMINHO; cd $CAMINHO; done
+	rm -Rf /home/caminhos.temp
 }
 verificadominio () {
 	BASE=/home/vtinstall/vartemp/dominiobase
@@ -49,7 +97,7 @@ verificalogin () {
 		numerologin=`echo $loginconflito | cut -c 8`
 		if [[ $numerologin = [[:digit:]] ]]; then
 			echo "${logincerto}$((${numerologin}+1))" > /home/vtinstall/vartemp/loginconflito
-	else 
+	else
 			echo "${logincerto}1" > /home/vtinstall/vartemp/loginconflito
 		fi
 		logindaconta=`cat /home/vtinstall/vartemp/loginconflito`
