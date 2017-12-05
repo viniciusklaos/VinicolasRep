@@ -325,11 +325,25 @@ configura_php () {
 motd () {
 	# - MOTD
 	echo "" > /etc/motd
-	echo "Server: server.$dominioprincipal"
+	echo "Server: server.$dominioprincipal" >> /etc/motd
 	echo "" >> /etc/motd
 	echo "Bem vindo" >> /etc/motd
 	echo "Vital Host 2018 - SmartCpanel" >> /etc/motd
 	echo "" >> /etc/motd
+}
+ps1 () {
+	cd /home/vtinstall/vartemp/
+	curl -O http://rep.vitalhost.com.br/v4/semcpanel/ps1.info
+	for i in `grep -n "\&\& PS1" /etc/bashrc | cut -d: -f1`; do
+    head -n $((${i}-1)) /etc/bashrc > /etc/bashrc.novo
+    cat /home/vtinstall/vartemp/ps1.info >> /etc/bashrc.novo
+    for j in `grep -A 1000 "\&\& PS1" /etc/bashrc | wc -l`; do
+      tail -$((${j}-1)) /etc/bashrc >> /etc/bashrc.novo
+    done
+  done
+  cat /etc/bashrc > /etc/bashrc.bkp
+  cat  /etc/bashrc.novo > /etc/bashrc
+  rm -Rf /etc/bashrc.novo
 }
 pagina_suspensao () {
 	WEBTEMP=/var/cpanel/webtemplates
