@@ -331,6 +331,19 @@ motd () {
 	echo "Vital Host 2018 - SmartCpanel" >> /etc/motd
 	echo "" >> /etc/motd
 }
+psi () {
+	for i in `grep -n "\&\& PS1" /etc/bashrc | cut -d: -f1`; do
+		head -n $((${i}-1)) /etc/bashrc > /etc/bashrc.novo
+		cat b >> /etc/bashrc.novo
+		for j in `grep -A 1000 "\&\& PS1" /etc/bashrc | wc -l`; do
+			tail -$((${j}-1)) /etc/bashrc >> /etc/bashrc.novo
+		done
+	done
+
+	cat /etc/bashrc > /etc/bashrc.bkp
+	cat  /etc/bashrc.novo > /etc/bashrc
+	rm -Rf /etc/bashrc.novo
+}
 pagina_suspensao () {
 	WEBTEMP=/var/cpanel/webtemplates
 	ROOT=/var/cpanel/webtemplates/root
