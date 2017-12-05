@@ -325,25 +325,11 @@ configura_php () {
 motd () {
 	# - MOTD
 	echo "" > /etc/motd
-	echo "Server: server.$dominioprincipal" >> /etc/motd
+	echo "Server: server.$dominioprincipal"
 	echo "" >> /etc/motd
 	echo "Bem vindo" >> /etc/motd
 	echo "Vital Host 2018 - SmartCpanel" >> /etc/motd
 	echo "" >> /etc/motd
-}
-ps1 () {
-	cd /home/vtinstall/vartemp/
-	curl -O http://rep.vitalhost.com.br/v4/semcpanel/ps1.info
-	for i in `grep -n "\&\& PS1" /etc/bashrc | cut -d: -f1`; do
-    head -n $((${i}-1)) /etc/bashrc > /etc/bashrc.novo
-    cat /home/vtinstall/vartemp/ps1.info >> /etc/bashrc.novo
-    for j in `grep -A 1000 "\&\& PS1" /etc/bashrc | wc -l`; do
-      tail -$((${j}-1)) /etc/bashrc >> /etc/bashrc.novo
-    done
-  done
-  cat /etc/bashrc > /etc/bashrc.bkp
-  cat  /etc/bashrc.novo > /etc/bashrc
-  rm -Rf /etc/bashrc.novo
 }
 pagina_suspensao () {
 	WEBTEMP=/var/cpanel/webtemplates
@@ -569,11 +555,11 @@ if [ $dominioprincipal == $dominio ]; then
 	dns_vps;
 	public_e_banco;
 	gera_cron;
-	echo -e "DNS:"
+	echo -e "${RESET}DNS:"
 	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
 	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
 	echo -e ""
-	echo -e "Reversos:"
+	echo -e "${RESET}Reversos:"
 	echo -e "${AMARELO}$ipprincipal > server.$dominio"
 	echo -e "${AMARELO}$ipsecundario > smtp.$dominio ${RESET}"
 else
@@ -585,10 +571,10 @@ else
 	dns_signo;
 	public_e_banco;
 	gera_cron;
-	echo -e "DNS:"
+	echo -e "${RESET}DNS:"
 	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
 	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
 	echo -e ""
-	echo -e "Reverso:"
+	echo -e "${RESET}Reverso:"
 	echo -e "${AMARELO}$ipdd > smtp.$dominio${RESET}"
 fi
