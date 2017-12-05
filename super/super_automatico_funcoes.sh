@@ -331,7 +331,7 @@ motd () {
 	echo "Vital Host 2018 - SmartCpanel" >> /etc/motd
 	echo "" >> /etc/motd
 }
-psi () {
+ps1 () {
 	for i in `grep -n "\&\& PS1" /etc/bashrc | cut -d: -f1`; do
 		head -n $((${i}-1)) /etc/bashrc > /etc/bashrc.novo
 		cat b >> /etc/bashrc.novo
