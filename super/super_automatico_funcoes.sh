@@ -542,10 +542,9 @@ gera_cron () {
 cores_gnu;
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
-verificaip;
-verificadominio;
 echo $dominio > /home/vtinstall/vartemp/domaintemp
 if [ $dominioprincipal == $dominio ]; then
+	verificadominio;
 	instala_vt_libs;
 	instala_caminhos;
 	whm_config;
@@ -568,6 +567,8 @@ if [ $dominioprincipal == $dominio ]; then
 	echo -e "${AMARELO}$ipprincipal > server.$dominio"
 	echo -e "${AMARELO}$ipsecundario > smtp.$dominio ${RESET}"
 else
+	verificadominio;
+	verificaip;
 	verificalogin;
 	gera_spf;
 	cria_conta;
