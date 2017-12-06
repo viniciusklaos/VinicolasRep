@@ -278,9 +278,9 @@ configura_exim () {
 	perl -p -i -e 's/deliver_queue_load_max = 12/deliver_queue_load_max = 18/g' /etc/exim.conf
 	perl -p -i -e 's/remote_max_parallel = 10/remote_max_parallel = 20/g' /etc/exim.conf
 	perl -p -i -e 's/smtp_accept_queue_per_connection = 30/smtp_accept_queue_per_connection = 0/g' /etc/exim.conf
-	perl -p -i -e 's/timeout_frozen_after = 5d/timeout_frozen_after = 2h/g' /etc/exim.conf
+	perl -p -i -e 's/timeout_frozen_after = 5d/timeout_frozen_after = 2d/g' /etc/exim.conf
 	perl -p -i -e 's/ignore_bounce_errors_after = 1d/ignore_bounce_errors_after = 1h/g' /etc/exim.conf
-	perl -p -i -e 's/auto_thaw = 7d/auto_thaw = 1d/g' /etc/exim.conf
+	perl -p -i -e 's/auto_thaw = 7d/auto_thaw = 3d/g' /etc/exim.conf
 	perl -p -i -e 's/smtp_connect_backlog = 50/smtp_connect_backlog = 200/g' /etc/exim.conf
 	perl -p -i -e 's/smtp_accept_max = 100/smtp_accept_max = 5000/g' /etc/exim.conf
 }
@@ -434,12 +434,18 @@ cria_conta () {
 	chattr +i /etc/mailips
 	chattr +i /etc/mailhelo
 }
+dns () {
+	for IP in `ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/`; do echo "$IP" > /home/vtinstall/vartemp/ip$COUNT.txt; COUNT=`expr $COUNT + 1`; done;
+
+}
 dns_vps () {
 	HOSTNAME=`hostname`
 	/usr/local/cpanel/bin/dkim_keys_uninstall $LOGIN
 	sleep 1
 	/usr/local/cpanel/bin/spf_uninstaller $LOGIN
 	sleep 1
+	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip1.txt`
+	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip2.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
 	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
 	; Zone file for $dominio
@@ -487,6 +493,8 @@ dns_signo () {
 	sleep 1
 	/usr/local/cpanel/bin/spf_uninstaller $LOGIN
 	sleep 1
+	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip1.txt`
+	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip2.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
 	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
 	; Zone file for $dominio
@@ -635,6 +643,7 @@ if [ $dominioprincipal == $dominio ]; then
 	pagina_suspensao;
 	verificalogin;
 	gera_spf;
+	dns;
 	cria_conta;
 	dns_vps;
 	public_e_banco;
