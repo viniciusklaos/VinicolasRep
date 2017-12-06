@@ -1,0 +1,4 @@
+# http://rep.vitalhost.com.br/v4/automatico/menu
+[ -d /home/vtinstall ] || mkdir /home/vtinstall; cd /home/vtinstall
+[ -d /home/vtinstall/menu ] || mkdir /home/vtinstall/menu; cd /home/vtinstall/menu
+curl -O http://rep.vitalhost.com.br/v4/automatico/menu.sh && sh menu.sh
