@@ -1,0 +1,1 @@
+  [ "$PS1" = "\\s-\\v\\\$ " ] && PS1="[`hostname | cut -d. -f2-10`, load: `cat /proc/loadavg | awk '{ print $1; }'`] (\d - \t)\n\w \\$ "
