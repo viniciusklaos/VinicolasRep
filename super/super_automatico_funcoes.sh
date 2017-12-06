@@ -73,13 +73,16 @@ instala_caminhos () {
 	rm -Rf /home/caminhos.temp
 }
 verificadominio () {
+	[ -d /home/vtinstall/vartemp ] || instala_caminhos; sleep 0;
 	BASE=/home/vtinstall/vartemp/dominiobase
 	if [ -z "$BASE" ]; then
+		echo $dominio > /home/vtinstall/vartemp/domaintemp
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
 		clear
 		echo -e "${AMARELO}Domínio principal:${VERDE} $dominioprincipal"
 		sleep 3
 	else
+		echo $dominio > /home/vtinstall/vartemp/domaintemp
 		echo $dominio > /home/vtinstall/vartemp/dominiobase
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
 		clear
@@ -125,32 +128,45 @@ instala_vt_libs () {
 	echo "cat /etc/trueuserdomains | cut -d: -f1" > dominios
 	chmod a+x ips
 	chmod a+x dominios
-	rm -rf dedicar; curl -O http://rep.vitalhost.com.br/v4/semcpanel/dedicar; chmod a+x dedicar;
-	rm -rf remover; curl -O http://rep.vitalhost.com.br/v4/semcpanel/remover; chmod a+x remover;
-	rm -rf contar; curl -O http://rep.vitalhost.com.br/v4/semcpanel/contar; chmod a+x contar;
-	rm -rf suspender; curl -O http://rep.vitalhost.com.br/v4/semcpanel/suspender; chmod a+x suspender;
-	rm -rf unsuspender; curl -O http://rep.vitalhost.com.br/v4/semcpanel/unsuspender; chmod a+x unsuspender;
-	rm -rf ipuso; curl -O http://rep.vitalhost.com.br/v4/semcpanel/ipuso; chmod a+x ipuso;
+	rm -rf dedicar
+	rm -rf remover
+	rm -rf contar
+	rm -rf suspender
+	rm -rf unsuspender
+	rm -rf ipuso
+	curl -s -O rep.vitalhost.com.br/v4/semcpanel/dedicar 2>/dev/null
+	curl -s -O rep.vitalhost.com.br/v4/semcpanel/remover 2>/dev/null
+	curl -s -O rep.vitalhost.com.br/v4/semcpanel/contar 2>/dev/null
+	curl -s -O rep.vitalhost.com.br/v4/semcpanel/suspender 2>/dev/null
+	curl -s -O rep.vitalhost.com.br/v4/semcpanel/unsuspender 2>/dev/null
+	curl -s -O rep.vitalhost.com.br/v4/semcpanel/ipuso 2>/dev/null
+	chmod a+x dedicar
+	chmod a+x remover
+	chmod a+x contar
+	chmod a+x suspender
+	chmod a+x unsuspender
+	chmod a+x ipuso
 	## -- Instalando vtbackup
-	cd /home; rm -rf instalarbackup.sh; wget rep.vitalhost.com.br/v4/backup/instalarbackup.sh && sh instalarbackup.sh; rm -rf instalarbackup.sh
+	cd /home; rm -rf instalarbackup.sh; curl -s -O rep.vitalhost.com.br/v4/backup/instalarbackup.sh 2>/dev/null
+	sh instalarbackup.sh; rm -rf instalarbackup.sh
 }
 gera_spf () {
 	SPF=`ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | cut -f1-3 -d. | uniq | sed 's/^/+ip4:/' | sed 's/$/.0\/24 /' | sed 's/ //g' |sed ':a;$!N;s/\n//;ta;'`
 }
 whm_config () {
 	# - Fazendo as configurações do "Basic"
-	if grep "ADDR " /etc/wwwacct.conf; then
-	  if grep "ADDR $ipprincipal" /etc/wwwacct.conf; then
+	if grep -q "ADDR " /etc/wwwacct.conf; then
+	  if grep -q "ADDR $IPPRINCIPAL" /etc/wwwacct.conf; then
 	    sleep 0
 	  else
 	    sed -i '/ADDR /d' /etc/wwwacct.conf
-	    echo "ADDR $ipprincipal" >> /etc/wwwacct.conf
+	    echo "ADDR $IPPRINCIPAL" >> /etc/wwwacct.conf
 	  fi
 	else
 		   echo "Nao encontrado ADDR no servidor: $dominio" | mail -s "ADDR FAIL $dominio" vinicius@centraldousuario.com.br
 	fi
-	if grep "NS " /etc/wwwacct.conf; then
-	  if grep "NS ns1.$dominio" /etc/wwwacct.conf; then
+	if grep -q "NS " /etc/wwwacct.conf; then
+	  if grep -q "NS ns1.$dominio" /etc/wwwacct.conf; then
 	    sleep 0
 	  else
 	    sed -i '/NS /d' /etc/wwwacct.conf
@@ -159,8 +175,8 @@ whm_config () {
 	else
 	  echo "Nao encontrado NS no servidor: $dominio" | mail -s "NS FAIL $dominio" vinicius@centraldousuario.com.br
 	fi
-	if grep "CONTACTEMAIL " /etc/wwwacct.conf; then
-	  if grep "CONTACTEMAIL root@server.$dominio" /etc/wwwacct.conf; then
+	if grep -q "CONTACTEMAIL " /etc/wwwacct.conf; then
+	  if grep -q "CONTACTEMAIL root@server.$dominio" /etc/wwwacct.conf; then
 	    sleep 0
 	  else
 	    sed -i '/CONTACTEMAIL /d' /etc/wwwacct.conf
@@ -169,8 +185,8 @@ whm_config () {
 	else
 	  echo "Nao encontrado CONTACTEMAIL no servidor: $dominio" | mail -s "CONTACTEMAIL FAIL $dominio" vinicius@centraldousuario.com.br
 	fi
-	if grep "NS2 " /etc/wwwacct.conf; then
-	  if grep "NS2 ns2.$dominio" /etc/wwwacct.conf; then
+	if grep -q "NS2 " /etc/wwwacct.conf; then
+	  if grep -q "NS2 ns2.$dominio" /etc/wwwacct.conf; then
 	    sleep 0
 	  else
 	    sed -i '/NS2 /d' /etc/wwwacct.conf
@@ -179,8 +195,8 @@ whm_config () {
 	else
 	  echo "Nao encontrado NS2 no servidor: $dominio" | mail -s "NS2 FAIL $dominio" vinicius@centraldousuario.com.br
 	fi
-	if grep "HOST " /etc/wwwacct.conf; then
-	  if grep "HOST server.$dominio" /etc/wwwacct.conf; then
+	if grep -q "HOST " /etc/wwwacct.conf; then
+	  if grep -q "HOST server.$dominio" /etc/wwwacct.conf; then
 	    sleep 0
 	  else
 	    sed -i '/HOST /d' /etc/wwwacct.conf
@@ -271,7 +287,7 @@ configura_exim () {
 	@TRANSPORTSTART@" > /etc/exim.conf.local
 	# - Desabilitando o EximStats
 	/usr/local/cpanel/libexec/tailwatchd --disable=Cpanel::TailWatch::Eximstats
-	service exim restart
+	service exim restart 2>> /dev/null
 	## -- Aumentando performance do Exim
 	#
 	perl -p -i -e 's/queue_only_load = 24/queue_only_load = 18/g' /etc/exim.conf
@@ -298,7 +314,7 @@ configura_php () {
 motd () {
 	# - MOTD
 	echo "" > /etc/motd
-	echo "Server: server.$dominioprincipal"
+	echo "Server: server.$dominioprincipal" >> /etc/motd
 	echo "" >> /etc/motd
 	echo "Bem vindo" >> /etc/motd
 	echo "Vital Host 2018 - SmartCpanel" >> /etc/motd
@@ -306,7 +322,7 @@ motd () {
 }
 ps1 () {
 	cd /home/vtinstall/vartemp/
-	curl -O http://rep.vitalhost.com.br/v4/semcpanel/ps1.info
+	curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/ps1.info 2>> /dev/null
 	for i in `grep -n "\&\& PS1" /etc/bashrc | cut -d: -f1`; do
 		head -n $((${i}-1)) /etc/bashrc > /etc/bashrc.novo
 		cat /home/vtinstall/vartemp/ps1.info >> /etc/bashrc.novo
@@ -319,32 +335,10 @@ ps1 () {
 	rm -Rf /etc/bashrc.novo
 }
 pagina_suspensao () {
-	WEBTEMP=/var/cpanel/webtemplates
-	ROOT=/var/cpanel/webtemplates/root
-	ENGLISH=/var/cpanel/webtemplates/root/english
-	if [ -e "$WEBTEMP" ]; then
-	  cd /var/cpanel/webtemplates
-	else
-	  cd /var/cpanel
-	  mkdir webtemplates
-	  cd webtemplates
-	fi
-	if [ -e "$ROOT" ]; then
-	  cd /var/cpanel/webtemplates/root
-	else
-	  cd /var/cpanel/webtemplates
-	  mkdir root
-	  cd root
-	fi
-	if [ -e "$ENGLISH" ]; then
-	  cd /var/cpanel/webtemplates/root/english
-	else
-	  cd /var/cpanel/webtemplates/root
-	  mkdir english
-	  cd english
-	fi
-	chattr -i suspended.tmpl
-	> suspended.tmpl
+	[ -d /var/cpanel/webtemplates ] || mkdir -p /var/cpanel/webtemplates; sleep 0;
+	[ -d /var/cpanel/webtemplates/root ] || mkdir -p /var/cpanel/webtemplates/root; sleep 0;
+	[ -d /var/cpanel/webtemplates/root/english ] || mkdir -p /var/cpanel/webtemplates/root/english; sleep 0;
+	cd /var/cpanel/webtemplates/root/english
 	##  - Página de suspensão com chat
 	echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
 	<html>
@@ -413,7 +407,7 @@ pagina_suspensao () {
 }
 cria_conta () {
 	cd /home/vtinstall/vartemp/
-	curl -O http://rep.vitalhost.com.br/v4/semcpanel/vitchun.info
+	curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/vitchun.info 2>> /dev/null
 	senhavital=`cat /home/vtinstall/vartemp/vitchun.info`
 	rm -rf /home/vtinstall/vartemp/vitchun.info
 	chattr -i /etc/mailips
@@ -424,6 +418,7 @@ cria_conta () {
 	cat /etc/mailhelo > /etc/mailhelo.vt.temp
 	sort /etc/mailhelo.vt.temp > /etc/mailhelo.vt
 	rm -Rf /etc/mailhelo.vt.temp
+	clear
 	/scripts/createacct $dominio $logindaconta $senhavital
 	/scripts/addpop contato@$dominio $senhavital 0 250
 	/scripts/addpop abuse@$dominio $senhavital 0 250
@@ -436,16 +431,18 @@ cria_conta () {
 }
 dns () {
 	for IP in `ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/`; do echo "$IP" > /home/vtinstall/vartemp/ip$COUNT.txt; COUNT=`expr $COUNT + 1`; done;
+	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip.txt`
+	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 
 }
 dns_vps () {
 	HOSTNAME=`hostname`
-	/usr/local/cpanel/bin/dkim_keys_uninstall $LOGIN
+	/usr/local/cpanel/bin/dkim_keys_uninstall $logindaconta
 	sleep 1
-	/usr/local/cpanel/bin/spf_uninstaller $LOGIN
+	/usr/local/cpanel/bin/spf_uninstaller $logindaconta
 	sleep 1
-	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip1.txt`
-	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip2.txt`
+	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip.txt`
+	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
 	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
 	; Zone file for $dominio
@@ -482,19 +479,22 @@ dns_vps () {
 	smtp		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
 	echo "_dmarc		3600	IN	TXT	\"v=DMARC1; p=none; sp=none; aspf=r; adkim=s; rua=mailto:postmaster@$DOMINIO\"" >> /var/named/${dominio}.db
 	sleep 2
-	/usr/local/cpanel/bin/dkim_keys_install $LOGIN
+	/usr/local/cpanel/bin/dkim_keys_install $logindaconta
 	sleep 2
-	/usr/local/cpanel/bin/spf_installer $LOGIN
+	/usr/local/cpanel/bin/spf_installer $logindaconta
+	sed -i '/spf1/d' /var/named/${dominio}.db
+	echo "$dominio.	IN TXT	\"v=spf1 +a +mx $SPF ~all\"" >> /var/named/${dominio}.db
 	service named restart
-}
+
+	}
 dns_signo () {
 	HOSTNAME=`hostname`
-	/usr/local/cpanel/bin/dkim_keys_uninstall $LOGIN
+	/usr/local/cpanel/bin/dkim_keys_uninstall $logindaconta
 	sleep 1
-	/usr/local/cpanel/bin/spf_uninstaller $LOGIN
+	/usr/local/cpanel/bin/spf_uninstaller $logindaconta
 	sleep 1
-	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip1.txt`
-	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip2.txt`
+	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip.txt`
+	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
 	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
 	; Zone file for $dominio
@@ -530,9 +530,11 @@ dns_signo () {
 	echo "smtp		3600	IN	A	$ipdd" >> /var/named/${dominio}.db
 	echo "_dmarc		3600	IN	TXT	\"v=DMARC1; p=none; sp=none; aspf=r; adkim=s; rua=mailto:postmaster@$DOMINIO\"" >> /var/named/${dominio}.db
 	sleep 2
-	/usr/local/cpanel/bin/dkim_keys_install $LOGIN
+	/usr/local/cpanel/bin/dkim_keys_install $logindaconta
 	sleep 2
-	/usr/local/cpanel/bin/spf_installer $LOGIN
+	/usr/local/cpanel/bin/spf_installer $logindaconta
+	sed -i '/spf1/d' /var/named/${dominio}.db
+	echo "$dominio.	IN TXT	\"v=spf1 +a +mx $SPF ~all\"" >> /var/named/${dominio}.db
 	service named restart
 }
 public_e_banco () {
@@ -552,30 +554,30 @@ public_e_banco () {
 
 	if [ "$admin" == '0' ] && [ "$PowerMTA" == '0' ] ; then # Não é administrador e envia com EXIM:
 	  cd /home/$logindaconta/public_html
-	  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz
-	  tar -vxzf public.tar.gz
+	  curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz 2>> /dev/null
+	  tar -vxzf public.tar.gz 2>/dev/null
 	  rm -Rf public.tar.gz
-	  tar -vxzf base.tar.gz
+	  tar -vxzf base.tar.gz 2>/dev/null
 	  rm -Rf base.tar.gz
 	  mysql "$logindaconta"_banco < base1.sql
 	  rm -rf base1.sql
 	  chown -R $logindaconta.$logindaconta *
 	elif [ "$admin" == '1' ] && [ "$PowerMTA" == '0' ] ; then # É adminsitrador e envia com EXIM:
 	  cd /home/$logindaconta/public_html
-	  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public_adm.tar.gz
-	  tar -vxzf public_adm.tar.gz
+	  curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/public_adm.tar.gz 2>> /dev/null
+	  tar -vxzf public_adm.tar.gz 2>/dev/null
 	  rm -Rf public_adm.tar.gz
-	  tar -vxzf base.tar.gz
+	  tar -vxzf base.tar.gz 2>/dev/null
 	  rm -Rf base.tar.gz
 	  mysql "$logindaconta"_banco < base1.sql
 	  rm -rf base1.sql
 	  chown -R $logindaconta.$logindaconta *
 	elif [ "$admin" == '1' ] && [ "$PowerMTA" == '1' ] ; then # É administrador e envia com PMTA:
 	  cd /home/$logindaconta/public_html
-	  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public_adm_pmta.tar.gz
-	  tar -vxzf public_adm_pmta.tar.gz
+	  curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/public_adm_pmta.tar.gz 2>> /dev/null
+	  tar -vxzf public_adm_pmta.tar.gz 2>/dev/null
 	  rm -Rf public_adm_pmta.tar.gz
-	  tar -vxzf base.tar.gz
+	  tar -vxzf base.tar.gz 2>/dev/null
 	  rm -Rf base.tar.gz
 	  mysql "$logindaconta"_banco < base1.sql
 	  rm -rf base1.sql
@@ -585,8 +587,8 @@ public_e_banco () {
 	fi
 	## -- Injetando banidos:
 	cd /home/$logindaconta/public_html
-	curl -O http://rep.vitalhost.com.br/v4/semcpanel/spamtraps.tar.gz
-	tar -vxzf spamtraps.tar.gz
+	curl -s -O http://rep.vitalhost.com.br/v4/semcpanel/spamtraps.tar.gz 2>> /dev/null
+	tar -vxzf spamtraps.tar.gz 2>/dev/null
 	rm -Rf spamtraps.tar.gz
 	mysql "$logindaconta"_banco < spamtraps.sql
 	rm -Rf spamtraps.sql
@@ -630,9 +632,8 @@ gera_cron () {
 cores_gnu;
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
-echo $dominio > /home/vtinstall/vartemp/domaintemp
+verificadominio;
 if [ $dominioprincipal == $dominio ]; then
-	verificadominio;
 	instala_vt_libs;
 	instala_caminhos;
 	whm_config;
@@ -649,12 +650,12 @@ if [ $dominioprincipal == $dominio ]; then
 	public_e_banco;
 	gera_cron;
 	echo -e "${RESET}DNS:"
-	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
-	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
+	echo -e "${AMARELO}ns1.$dominio > $IPPRINCIPAL"
+	echo -e "${AMARELO}ns2.$dominio > $IPSECUNDARIO${RESET}"
 	echo -e ""
 	echo -e "${RESET}Reversos:"
-	echo -e "${AMARELO}$ipprincipal > server.$dominio"
-	echo -e "${AMARELO}$ipsecundario > smtp.$dominio ${RESET}"
+	echo -e "${AMARELO}$IPPRINCIPAL > server.$dominio"
+	echo -e "${AMARELO}$IPSECUNDARIO > smtp.$dominio ${RESET}"
 else
 	verificadominio;
 	verificaip;
@@ -665,8 +666,8 @@ else
 	public_e_banco;
 	gera_cron;
 	echo -e "${RESET}DNS:"
-	echo -e "${AMARELO}ns1.$dominio > $ipprincipal"
-	echo -e "${AMARELO}ns2.$dominio > $ipsecundario${RESET}"
+	echo -e "${AMARELO}ns1.$dominio > $IPPRINCIPAL"
+	echo -e "${AMARELO}ns2.$dominio > $IPSECUNDARIO${RESET}"
 	echo -e ""
 	echo -e "${RESET}Reverso:"
 	echo -e "${AMARELO}$ipdd > smtp.$dominio${RESET}"
