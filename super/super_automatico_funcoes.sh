@@ -1,4 +1,4 @@
-# Linux Environment
+# CentOS Environment
 PATH=`echo $PATH`
 cores_gnu () {
 	VERMELHO="\033[01;31;40m"
