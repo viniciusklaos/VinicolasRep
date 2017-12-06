@@ -135,15 +135,7 @@ instala_vt_libs () {
 	cd /home; rm -rf instalarbackup.sh; wget rep.vitalhost.com.br/v4/backup/instalarbackup.sh && sh instalarbackup.sh; rm -rf instalarbackup.sh
 }
 gera_spf () {
-	IPS=`ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/`
-	echo "$IPS" > /home/vtinstall/vartemp/ips.txt
-	IPS=`cat /home/vtinstall/vartemp/ips.txt`
-	cat /home/vtinstall/vartemp/ips.txt | cut -f1-3 -d. > /home/vtinstall/vartemp/ipspf.info
-	sort /home/vtinstall/vartemp/ipspf.info | uniq > /home/vtinstall/vartemp/spf.info
-	sed -i 's/^/+ip4:/' /home/vtinstall/vartemp/spf.info
-	sed -i 's/$/.0\/24 /' /home/vtinstall/vartemp/spf.info
-	sed -i ':a;$!N;s/\n//;ta;' /home/vtinstall/vartemp/spf.info
-	SPF=`cat /home/vtinstall/vartemp/spf.info`
+	SPF=`ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | cut -f1-3 -d. | uniq | sed 's/^/+ip4:/' | sed 's/$/.0\/24 /' | sed 's/ //g' |sed ':a;$!N;s/\n//;ta;'`
 }
 whm_config () {
 	# - Fazendo as configurações do "Basic"
