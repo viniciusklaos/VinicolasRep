@@ -74,8 +74,7 @@ instala_caminhos () {
 }
 verificadominio () {
 	[ -d /home/vtinstall/vartemp ] || instala_caminhos; sleep 0;
-	BASE=/home/vtinstall/vartemp/dominiobase
-	if [ -z "$BASE" ]; then
+	if [ -e /home/vtinstall/vartemp/dominiobase ]; then
 		echo $dominio > /home/vtinstall/vartemp/domaintemp
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
 		clear
@@ -84,6 +83,7 @@ verificadominio () {
 	else
 		echo $dominio > /home/vtinstall/vartemp/domaintemp
 		echo $dominio > /home/vtinstall/vartemp/dominiobase
+		chattr +i /home/vtinstall/vartemp/dominiobase
 		dominioprincipal=`cat /home/vtinstall/vartemp/dominiobase`
 		clear
 		echo "Configurando novo VPS de dominio: $dominio"
@@ -444,10 +444,8 @@ dns_vps () {
 	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip.txt`
 	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
-	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
-; Zone file for $dominio
-\$TTL 14400
-@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
+	grep -A 2 "Cpanel first" /var/named/${dominio}.db > /var/named/${dominio}.temp; cat /var/named/${dominio}.temp > /var/named/${dominio}.db; rm -Rf /var/named/${dominio}.temp
+	echo "@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
 2016041203      ; serial, todays date+todays
 3600            ; refresh, seconds
 7200            ; retry, seconds
@@ -496,10 +494,8 @@ dns_signo () {
 	IPPRINCIPAL=`cat /home/vtinstall/vartemp/ip.txt`
 	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
-	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
-; Zone file for $dominio
-\$TTL 14400
-@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
+grep -A 2 "Cpanel first" /var/named/${dominio}.db > /var/named/${dominio}.temp; cat /var/named/${dominio}.temp > /var/named/${dominio}.db; rm -Rf /var/named/${dominio}.temp
+	echo "@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
 2016041203      ; serial, todays date+todays
 3600            ; refresh, seconds
 7200            ; retry, seconds
