@@ -1,0 +1,35 @@
+Email Marketing Ideal Planos:
+
+Iniciante 1:
+500
+10000
+
+Iniciante 2:
+500
+25000
+
+Iniciante 3:
+500
+50000
+
+Iniciante 4:
+500
+100000
+
+======ADM======
+
+Ilimitado:
+60000
+a
+
+Avançado:
+40000
+25000000
+
+Intermediário:
+14000
+10000000
+
+Básico:
+2000
+1000000

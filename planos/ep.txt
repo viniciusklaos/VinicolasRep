@@ -1,0 +1,35 @@
+Envio Pratico Planos:
+
+Basico 1:
+500
+10000
+
+Basico 2:
+500
+350000
+
+Basico 3:
+2000
+1000000
+
+Basico 4:
+6000
+4000000
+
+======ADM======
+
+Profissional 1:
+15000
+10000000
+
+Profissional 2:
+25000
+18000000
+
+Profissional 3:
+40000
+28000000
+
+Profissional 4:
+60000
+40000000
