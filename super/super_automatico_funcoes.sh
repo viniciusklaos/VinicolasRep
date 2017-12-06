@@ -1,3 +1,5 @@
+# Linux Environment
+PATH=`echo $PATH`
 cores_gnu () {
 	VERMELHO="\033[01;31;40m"
 	VERDE="\033[01;32;40m"
@@ -461,20 +463,117 @@ cria_conta () {
 	chattr +i /etc/mailips
 	chattr +i /etc/mailhelo
 }
-# dns_vps () {}
-# dns_signo () {}
+dns_vps () {
+	HOSTNAME=`hostname`
+	/usr/local/cpanel/bin/dkim_keys_uninstall $LOGIN
+	sleep 1
+	/usr/local/cpanel/bin/spf_uninstaller $LOGIN
+	sleep 1
+	#	COPIANDO A ZONA FUNCIONAL:
+	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
+	; Zone file for $dominio
+	\$TTL 14400
+	@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
+	2016041203      ; serial, todays date+todays
+	3600            ; refresh, seconds
+	7200            ; retry, seconds
+	1209600         ; expire, seconds
+	86400 )         ; minimum, seconds
+	$dominio. 86400 IN NS ns1.$dominio.
+	$dominio. 86400 IN NS ns2.$dominio.
+	$dominio. IN A 			$IPPRINCIPAL
+	$dominio. IN MX 0 		$dominio.
+	mail IN CNAME 		$dominio.
+	www IN CNAME 		$dominio.
+	ftp IN A 			$IPPRINCIPAL
+	cpanel IN A 		$IPPRINCIPAL
+	webdisk IN A 		$IPPRINCIPAL
+	cpcalendars IN A 	$IPPRINCIPAL
+	cpcontacts IN A 	$IPPRINCIPAL
+	whm IN A 			$IPPRINCIPAL
+	webmail IN A 			$IPPRINCIPAL
+	;
+	;
+	;
+	;							NAMESERVERS, SPF, DMARC E DKIM
+	;
+	;
+	;" > /var/named/${dominio}.db
+	echo "ns1		3600	IN	A	$IPPRINCIPAL
+	ns2		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
+	echo "server		3600	IN	A	$IPPRINCIPAL
+	smtp		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
+	echo "_dmarc		3600	IN	TXT	\"v=DMARC1; p=none; sp=none; aspf=r; adkim=s; rua=mailto:postmaster@$DOMINIO\"" >> /var/named/${dominio}.db
+	sleep 2
+	/usr/local/cpanel/bin/dkim_keys_install $LOGIN
+	sleep 2
+	/usr/local/cpanel/bin/spf_installer $LOGIN
+	service named restart
+}
+dns_signo () {
+	HOSTNAME=`hostname`
+	/usr/local/cpanel/bin/dkim_keys_uninstall $LOGIN
+	sleep 1
+	/usr/local/cpanel/bin/spf_uninstaller $LOGIN
+	sleep 1
+	#	COPIANDO A ZONA FUNCIONAL:
+	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
+	; Zone file for $dominio
+	\$TTL 14400
+	@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
+	2016041203      ; serial, todays date+todays
+	3600            ; refresh, seconds
+	7200            ; retry, seconds
+	1209600         ; expire, seconds
+	86400 )         ; minimum, seconds
+	$dominio. 86400 IN NS ns1.$dominio.
+	$dominio. 86400 IN NS ns2.$dominio.
+	$dominio. IN A 			$IPPRINCIPAL
+	$dominio. IN MX 0 		$dominio.
+	mail IN CNAME 		$dominio.
+	www IN CNAME 		$dominio.
+	ftp IN A 			$IPPRINCIPAL
+	cpanel IN A 		$IPPRINCIPAL
+	webdisk IN A 		$IPPRINCIPAL
+	cpcalendars IN A 	$IPPRINCIPAL
+	cpcontacts IN A 	$IPPRINCIPAL
+	whm IN A 			$IPPRINCIPAL
+	webmail IN A 			$IPPRINCIPAL
+	;
+	;
+	;
+	;							NAMESERVERS, SPF, DMARC E DKIM
+	;
+	;
+	;" > /var/named/${dominio}.db
+	echo "ns1		3600	IN	A	$IPPRINCIPAL
+	ns2		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
+	echo "smtp		3600	IN	A	$ipdd" >> /var/named/${dominio}.db
+	echo "_dmarc		3600	IN	TXT	\"v=DMARC1; p=none; sp=none; aspf=r; adkim=s; rua=mailto:postmaster@$DOMINIO\"" >> /var/named/${dominio}.db
+	sleep 2
+	/usr/local/cpanel/bin/dkim_keys_install $LOGIN
+	sleep 2
+	/usr/local/cpanel/bin/spf_installer $LOGIN
+	service named restart
+}
 public_e_banco () {
 	taxahora=`cat /tmp/horatemp`
 	taxames=`cat /tmp/mestemp`
 	admin=`cat /tmp/admin`
-	PowerMTA=`cat /tmp/envio`
+
+	taxamax=`echo 25001`
+	if [ $taxahora -ge $taxamax ]; then
+  	PowerMTA=1
+	else
+  	PowerMTA=0
+	fi
 
 	mysql -e "create database ${logindaconta}_banco;"
 	mysql -Be "grant all privileges on ${logindaconta}_banco.* to '${logindaconta}_dbuser'@'localhost' identified by \"phCA24bgK\";"
 
 	if [ "$admin" == '0' ] && [ "$PowerMTA" == '0' ] ; then # Não é administrador e envia com EXIM:
 	  cd /home/$logindaconta/public_html
-	  wget http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz
+	  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public.tar.gz
 	  tar -vxzf public.tar.gz
 	  rm -Rf public.tar.gz
 	  tar -vxzf base.tar.gz
@@ -484,7 +583,7 @@ public_e_banco () {
 	  chown -R $logindaconta.$logindaconta *
 	elif [ "$admin" == '1' ] && [ "$PowerMTA" == '0' ] ; then # É adminsitrador e envia com EXIM:
 	  cd /home/$logindaconta/public_html
-	  wget http://rep.vitalhost.com.br/v4/semcpanel/public_adm.tar.gz
+	  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public_adm.tar.gz
 	  tar -vxzf public_adm.tar.gz
 	  rm -Rf public_adm.tar.gz
 	  tar -vxzf base.tar.gz
@@ -494,7 +593,7 @@ public_e_banco () {
 	  chown -R $logindaconta.$logindaconta *
 	elif [ "$admin" == '1' ] && [ "$PowerMTA" == '1' ] ; then # É administrador e envia com PMTA:
 	  cd /home/$logindaconta/public_html
-	  wget http://rep.vitalhost.com.br/v4/semcpanel/public_adm_pmta.tar.gz
+	  curl -O http://rep.vitalhost.com.br/v4/semcpanel/public_adm_pmta.tar.gz
 	  tar -vxzf public_adm_pmta.tar.gz
 	  rm -Rf public_adm_pmta.tar.gz
 	  tar -vxzf base.tar.gz
@@ -507,7 +606,7 @@ public_e_banco () {
 	fi
 	## -- Injetando banidos:
 	cd /home/$logindaconta/public_html
-	wget http://rep.vitalhost.com.br/v4/semcpanel/spamtraps.tar.gz
+	curl -O http://rep.vitalhost.com.br/v4/semcpanel/spamtraps.tar.gz
 	tar -vxzf spamtraps.tar.gz
 	rm -Rf spamtraps.tar.gz
 	mysql "$logindaconta"_banco < spamtraps.sql
