@@ -445,38 +445,38 @@ dns_vps () {
 	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
 	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
-	; Zone file for $dominio
-	\$TTL 14400
-	@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
-	2016041203      ; serial, todays date+todays
-	3600            ; refresh, seconds
-	7200            ; retry, seconds
-	1209600         ; expire, seconds
-	86400 )         ; minimum, seconds
-	$dominio. 86400 IN NS ns1.$dominio.
-	$dominio. 86400 IN NS ns2.$dominio.
-	$dominio. IN A 			$IPPRINCIPAL
-	$dominio. IN MX 0 		$dominio.
-	mail IN CNAME 		$dominio.
-	www IN CNAME 		$dominio.
-	ftp IN A 			$IPPRINCIPAL
-	cpanel IN A 		$IPPRINCIPAL
-	webdisk IN A 		$IPPRINCIPAL
-	cpcalendars IN A 	$IPPRINCIPAL
-	cpcontacts IN A 	$IPPRINCIPAL
-	whm IN A 			$IPPRINCIPAL
-	webmail IN A 			$IPPRINCIPAL
-	;
-	;
-	;
-	;							NAMESERVERS, SPF, DMARC E DKIM
-	;
-	;
-	;" > /var/named/${dominio}.db
+; Zone file for $dominio
+\$TTL 14400
+@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
+2016041203      ; serial, todays date+todays
+3600            ; refresh, seconds
+7200            ; retry, seconds
+1209600         ; expire, seconds
+86400 )         ; minimum, seconds
+$dominio. 86400 IN NS ns1.$dominio.
+$dominio. 86400 IN NS ns2.$dominio.
+$dominio. IN A 			$IPPRINCIPAL
+$dominio. IN MX 0 		$dominio.
+mail IN CNAME 		$dominio.
+www IN CNAME 		$dominio.
+ftp IN A 			$IPPRINCIPAL
+cpanel IN A 		$IPPRINCIPAL
+webdisk IN A 		$IPPRINCIPAL
+cpcalendars IN A 	$IPPRINCIPAL
+cpcontacts IN A 	$IPPRINCIPAL
+whm IN A 			$IPPRINCIPAL
+webmail IN A 			$IPPRINCIPAL
+;
+;
+;
+;							NAMESERVERS, SPF, DMARC E DKIM
+;
+;
+;" > /var/named/${dominio}.db
 	echo "ns1		3600	IN	A	$IPPRINCIPAL
-	ns2		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
+ns2		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
 	echo "server		3600	IN	A	$IPPRINCIPAL
-	smtp		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
+smtp		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
 	echo "_dmarc		3600	IN	TXT	\"v=DMARC1; p=none; sp=none; aspf=r; adkim=s; rua=mailto:postmaster@$DOMINIO\"" >> /var/named/${dominio}.db
 	sleep 2
 	/usr/local/cpanel/bin/dkim_keys_install $logindaconta
@@ -497,36 +497,36 @@ dns_signo () {
 	IPSECUNDARIO=`cat /home/vtinstall/vartemp/ip1.txt`
 	#	COPIANDO A ZONA FUNCIONAL:
 	echo "; cPanel first:11.54.0.21 (update_time):1460480627 11.54.0.21: Cpanel::ZoneFile::VERSION:1.3 hostname:${HOSTNAME} latest:11.54.0.21
-	; Zone file for $dominio
-	\$TTL 14400
-	@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
-	2016041203      ; serial, todays date+todays
-	3600            ; refresh, seconds
-	7200            ; retry, seconds
-	1209600         ; expire, seconds
-	86400 )         ; minimum, seconds
-	$dominio. 86400 IN NS ns1.$dominio.
-	$dominio. 86400 IN NS ns2.$dominio.
-	$dominio. IN A 			$IPPRINCIPAL
-	$dominio. IN MX 0 		$dominio.
-	mail IN CNAME 		$dominio.
-	www IN CNAME 		$dominio.
-	ftp IN A 			$IPPRINCIPAL
-	cpanel IN A 		$IPPRINCIPAL
-	webdisk IN A 		$IPPRINCIPAL
-	cpcalendars IN A 	$IPPRINCIPAL
-	cpcontacts IN A 	$IPPRINCIPAL
-	whm IN A 			$IPPRINCIPAL
-	webmail IN A 			$IPPRINCIPAL
-	;
-	;
-	;
-	;							NAMESERVERS, SPF, DMARC E DKIM
-	;
-	;
-	;" > /var/named/${dominio}.db
+; Zone file for $dominio
+\$TTL 14400
+@      86400    IN      SOA     ns1.$dominio. root.server.$dominio. (
+2016041203      ; serial, todays date+todays
+3600            ; refresh, seconds
+7200            ; retry, seconds
+1209600         ; expire, seconds
+86400 )         ; minimum, seconds
+$dominio. 86400 IN NS ns1.$dominio.
+$dominio. 86400 IN NS ns2.$dominio.
+$dominio. IN A 			$IPPRINCIPAL
+$dominio. IN MX 0 		$dominio.
+mail IN CNAME 		$dominio.
+www IN CNAME 		$dominio.
+ftp IN A 			$IPPRINCIPAL
+cpanel IN A 		$IPPRINCIPAL
+webdisk IN A 		$IPPRINCIPAL
+cpcalendars IN A 	$IPPRINCIPAL
+cpcontacts IN A 	$IPPRINCIPAL
+whm IN A 			$IPPRINCIPAL
+webmail IN A 			$IPPRINCIPAL
+;
+;
+;
+;							NAMESERVERS, SPF, DMARC E DKIM
+;
+;
+;" > /var/named/${dominio}.db
 	echo "ns1		3600	IN	A	$IPPRINCIPAL
-	ns2		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
+ns2		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
 	echo "smtp		3600	IN	A	$ipdd" >> /var/named/${dominio}.db
 	echo "_dmarc		3600	IN	TXT	\"v=DMARC1; p=none; sp=none; aspf=r; adkim=s; rua=mailto:postmaster@$DOMINIO\"" >> /var/named/${dominio}.db
 	sleep 2
