@@ -497,11 +497,11 @@ smtp		3600	IN	A	$IPSECUNDARIO" >> /var/named/${dominio}.db
 	/usr/local/cpanel/bin/dkim_keys_install $logindaconta
 	sleep 2
 	/usr/local/cpanel/bin/spf_installer $logindaconta
-sed -i '/spf1/d' /var/named/${dominio}.db
-echo "$dominio.	IN TXT	\"v=spf1 +a +mx $SPF ~all\"" >> /var/named/${dominio}.db
+	sed -i '/spf1/d' /var/named/${dominio}.db
+	echo "$dominio.	IN TXT	\"v=spf1 +a +mx $SPF ~all\"" >> /var/named/${dominio}.db
 	service named restart
 
-}
+	}
 dns_signo () {
 	HOSTNAME=`hostname`
 	/usr/local/cpanel/bin/dkim_keys_uninstall $logindaconta
