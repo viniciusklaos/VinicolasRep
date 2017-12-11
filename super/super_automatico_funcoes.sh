@@ -9,6 +9,23 @@ cores_gnu () {
 	CIANO="\033[01;36;40m"
 	RESET="\033[00;37;40m"
 }
+verify_license () { 
+if [[ $VERIFICADOR == "sair" ]]; then
+	exit
+fi
+  echo y | /scripts/createacct verificadorvt.com verificador senha123  |
+  if grep -q "exceed the number of licensed users"; then
+    echo -e "${VERMELHO}Servidor não contem licenca para criacao de conta"
+    sleep 2
+    echo -e "${AMARELO}Adicione uma licenca ao IP: ${IPPRINCIPAL}${AMARELO}"
+    echo -e "Pressione qualquer tecla para continuar, ou ${VERMELHO}sair ${AMARELO}para finalizar${RESET}"
+    read VERIFICADOR
+  	verify_license;
+  else
+    echo y | /scripts/removeacct verificador
+    echo com licenca
+  fi
+}
 verificaip () {
 	ip a | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}' | cut -f1 -d/ | sort > ips.info
 	cat /etc/mailips | cut -d: -f2 | sed 's/ //g' | sort > ipdedicado.info
@@ -628,6 +645,7 @@ gera_cron () {
 cores_gnu;
 echo -e "${AMARELO}Escreva o domínio que deseja configurar:${VERDE}"
 read dominio
+verify_license;
 verificadominio;
 if [ $dominioprincipal == $dominio ]; then
 	instala_vt_libs;
